@@ -1,18 +1,38 @@
+%% Temporal Frequency (TF) Analysis - Dome Setup
+% This script analyzes pupillary responses to temporally modulated stimuli
+% at different spatial and temporal frequencies. It performs FFT analysis
+% to extract power at specific stimulus frequencies.
+%
+% Input files (selected via GUI):
+%   - Parameter file: Contains stimIn/stimOut with spatial/temporal frequency parameters
+%   - Left eye trace: Pupil area measurements over time
+%   - Right eye trace: Pupil area measurements over time
+%
+% Outputs:
+%   - FFT power at stimulus frequencies
+%   - Pupil area organized by spatial frequency, temporal frequency, and repeat
+%   - Saved .mat file with all analysis results
+%
+% Author: Fitzpatrick et al., 2024
+
 clear; clc; close all;
+
 %% Define variables and load data
 
-%make sure fps is ok
-stim_fps = 60;
-movie_fps = 15;
-mm_per_pix = 0.00345; %mm per pixel of trace measurements
-fixed = 0; %fix pupil change to last 5s
-Global = 1;
+% Experimental parameters - adjust these for your setup
+stim_fps = 60;  % Stimulus presentation frame rate (Hz)
+movie_fps = 15; % Pupil tracking camera frame rate (Hz)
+mm_per_pix = 0.00345; % Conversion: millimeters per pixel for pupil measurements
 
-%locomotion thresholds
-loco_filter = 1; %on(1) or off(0)
-spd_thresh = 0.5; %speed threshold in cm/s
-t_thresh = 2; %minimum duration of running bout, in s
-extra = 30; %amount after duration of running bout to remove, in s
+% Analysis options
+fixed = 0; % 0: use dynamic window around minimum, 1: use fixed 5s window
+Global = 1; % Global analysis flag
+
+%locomotion filtering thresholds
+loco_filter = 1; % 1: enable locomotion filtering, 0: disable
+spd_thresh = 0.5; % Speed threshold in cm/s to classify as locomotion
+t_thresh = 2; % Minimum duration of running bout (seconds)
+extra = 30; % Additional time after running to exclude (seconds) for pupil recovery
 
 %parameters
 [fileName, pathName]=uigetfile ('*.mat','Select parameter data');
@@ -39,35 +59,36 @@ else
     RArea = NaN(length(Data)/stim_fps*movie_fps,1); %in case there's no file
 end
 
-%extract speed/distance of mouse
+% Extract speed/distance of mouse from wheel encoder
+% Wheel parameters: 15 cm diameter, 4028 pulses per rotation
 mSpeed = zeros(length(Data),1);
 mSpeed(2:end) = abs(diff(Data(:,8)));
-mSpeed(mSpeed>150 | mSpeed<-150)= 0; %points where wheel count cycles back around (arduino bit limit reached)
-%wheel is 15cm in diameter, 4028 pulses per rotation, acquired every frame
-mSpeed = mSpeed*(15*pi*stim_fps/4028); %now in cm/s
-mSpeed = downsample(mSpeed,stim_fps/movie_fps);
-smoothSpeed = movmean(mSpeed,movie_fps/2,'omitnan');
+mSpeed(mSpeed>150 | mSpeed<-150)= 0; % Remove points where encoder cycles (bit limit)
+% Convert to cm/s: (pulses/frame) * (circumference/pulses_per_rotation) * fps
+mSpeed = mSpeed*(15*pi*stim_fps/4028); % now in cm/s
+mSpeed = downsample(mSpeed,stim_fps/movie_fps); % Match pupil tracking rate
+smoothSpeed = movmean(mSpeed,movie_fps/2,'omitnan'); % Smooth with 0.5s window
 
+% Apply locomotion filtering if enabled
 if loco_filter
-    BW = smoothSpeed>spd_thresh;
-    locofiltID = bwareaopen(BW,t_thresh*movie_fps);
-    %smoothSpeed(locofiltID) = NaN;
-    %extend amount blanked by an additional window for pupil
+    BW = smoothSpeed>spd_thresh;  % Identify frames above threshold
+    locofiltID = bwareaopen(BW,t_thresh*movie_fps);  % Keep only sustained bouts
+    % Extend blanked region to account for post-locomotion pupil recovery
     [labeledImage, numBlobs] = bwlabel(locofiltID);
     measurements = regionprops(labeledImage, 'BoundingBox');
     for k = 1 : numBlobs
-        % Get the bounding box for this particular blob.
+        % Get the bounding box for this locomotion bout
         thisBB = measurements(k).BoundingBox;
-        % Get rows and columns of the bounding box for this blob.
+        % Get rows of the bounding box
         row1 = ceil(thisBB(2));
-        row2 = row1 + thisBB(4)+extra*movie_fps;
+        row2 = row1 + thisBB(4)+extra*movie_fps;  % Add recovery time
         if row2>length(LArea)
             row2 = length(LArea);
         end
-        % Write white into original image there.
+        % Mark these frames as invalid
         locofiltID(row1:row2) = 1;
     end
-    LArea(locofiltID) = NaN;
+    LArea(locofiltID) = NaN;  % Set locomotion frames to NaN
     RArea(locofiltID) = NaN;
 end
 

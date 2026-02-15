@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "Pupillary Contrast Response Analysis Code"
+abstract: "MATLAB analysis and modeling code for investigating pupillary light reflex (PLR) and pupillary contrast responses in mice and humans. Includes tools for sigmoidal curve fitting, temporal frequency analysis, and optical transfer function modeling for different photoreceptor types."
+authors:
+  - family-names: "Fitzpatrick"
+    given-names: "[First Name]"
+    # Add ORCID if available: orcid: "https://orcid.org/0000-0000-0000-0000"
+  - name: "et al."
+repository-code: "https://github.com/kerschensteinerd/Fitzpatrick_2024"
+url: "https://github.com/kerschensteinerd/Fitzpatrick_2024"
+keywords:
+  - pupillary light reflex
+  - contrast response
+  - vision science
+  - neuroscience
+  - MATLAB
+  - mouse vision
+  - optical transfer function
+  - photoreceptors
+license: # Add license identifier (e.g., MIT, GPL-3.0, Apache-2.0)
+version: 1.0.0
+date-released: 2024-02-15
+references:
+  - type: article
+    title: "A pupillary contrast response in mice and humans - Neural mechanisms and visual functions"
+    authors:
+      - family-names: "Fitzpatrick"
+        given-names: "[First Name]"
+      - name: "et al."
+    year: 2024
+    # Add journal, DOI, etc. when available
+    # journal: "[Journal Name]"
+    # doi: "10.xxxx/xxxxx"

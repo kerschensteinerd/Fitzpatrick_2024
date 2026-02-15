@@ -1,0 +1,37 @@
+LICENSE
+=======
+
+This repository contains research code accompanying the manuscript:
+"A pupillary contrast response in mice and humans - Neural mechanisms and visual functions"
+by Fitzpatrick et al., 2024
+
+LICENSE TO BE DETERMINED
+------------------------
+
+Please specify the license under which this code is released. Common options for 
+research code include:
+
+1. MIT License - Permissive, allows commercial use with attribution
+2. GNU GPL v3.0 - Copyleft, requires derivative works to be open source
+3. Apache 2.0 - Permissive, with patent grant
+4. BSD 3-Clause - Permissive, simple and well-established
+5. Creative Commons (CC BY 4.0) - Common for research data/code
+
+For guidance on choosing a license, see: https://choosealicense.com/
+
+TEMPORARY USAGE TERMS
+---------------------
+
+Until a formal license is specified, the following terms apply:
+
+This code is provided for research and educational purposes. If you use this code 
+in your research, please cite:
+
+  Fitzpatrick et al. (2024). A pupillary contrast response in mice and humans - 
+  Neural mechanisms and visual functions. [Journal details to be added]
+
+For questions about usage rights, please contact the corresponding author or 
+open an issue on GitHub: https://github.com/kerschensteinerd/Fitzpatrick_2024/issues
+
+Copyright (c) 2024 Fitzpatrick et al.
+All rights reserved pending license specification.

@@ -1,6 +1,16 @@
-%This script analyzes PLR for a single experiment and generates a sigmoidal
-%fit and curve. It then saves the values at each illuminance and the EC50
-%from the curve fit. 
+%% Pupillary Light Reflex (PLR) Analysis - LED Setup (Individual)
+% This script analyzes pupillary responses to LED stimuli for individual subjects.
+% It fits sigmoidal dose-response curves to extract EC50 and Hill slope values.
+%
+% Input files (selected via GUI):
+%   - Parsed data file: Contains pupil traces and stimulus parameters
+%
+% Outputs:
+%   - Figure: Dose-response curve with sigmoidal fit
+%   - Saved .mat file: EC50, Hill slope, and all analysis results
+%
+% Author: Fitzpatrick et al., 2024
+
 clear; clc; close all;
 
 %%Load Parsed files
@@ -48,17 +58,15 @@ for ii = 1:length(ExpRStar)
   
 end
 
-%create model sigmoidal function; b(1) is minimum value, b(2) is maximum
-%value, b(3) is EC50, b(4) is Hill slope
-%note that EC50 is for x that is halfway between b(1) and b(2), so not
-%necessarily 0.5
+% Sigmoidal function for dose-response curve fitting
+% Parameters: b(1)=minimum, b(2)=maximum, b(3)=EC50, b(4)=Hill slope
+% Note: EC50 is the illuminance at halfway between min and max response
 SigmoidFit = @(b,x)(b(1)+(b(2)-b(1))./(1+(b(3)./x).^b(4)));
 %Initial guess for least squares regression
 beta0 = [0,1,100,-1];
-%define lower and upper bounds. Importantly, maximum is constrained to be
-%at 1, and minimum is constrained to be at 0.2. 
-lb = [0.2,1,ExpRStar(1)/10,-10];
-ub = [0.2,1,ExpRStar(end)*10,0];
+% Define bounds: minimum=0.2, maximum=1 (constrains to normalized range)
+lb = [0.2,1,ExpRStar(1)/10,-10];  % Lower bounds
+ub = [0.2,1,ExpRStar(end)*10,0];  % Upper bounds (Hill slope must be negative)
 
 
 

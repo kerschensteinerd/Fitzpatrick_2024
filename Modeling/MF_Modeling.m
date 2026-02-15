@@ -1,7 +1,38 @@
+%% Multi-Photoreceptor Optical Transfer Function Modeling
+% This script models the optical transfer functions (OTF) for different mouse
+% photoreceptor types (S-cone, M-cone, Rod, ipRGC) as a function of pupil size.
+% It then applies these OTFs to natural scene images to simulate how mice see.
+%
+% Requirements:
+%   - MATLAB Image Processing Toolbox
+%   - isetbio toolbox (https://github.com/isetbio/isetbio)
+%   - mouseCore function (custom - contact authors)
+%
+% Author: Fitzpatrick et al., 2024
+
 %% initialize
 clear; clc; close all;
 
-addpath(genpath('X:\\isetbio-master'))
+% ========== CONFIGURATION - UPDATE THESE PATHS ==========
+% Path to isetbio toolbox installation
+% Download from: https://github.com/isetbio/isetbio
+isetbio_path = 'X:\\isetbio-master';  % UPDATE THIS PATH
+if ~exist(isetbio_path, 'dir')
+    warning(['isetbio path not found: ' isetbio_path]);
+    warning('Please update isetbio_path variable to your isetbio installation directory');
+    warning('Download from: https://github.com/isetbio/isetbio');
+    error('Cannot proceed without isetbio');
+end
+addpath(genpath(isetbio_path))
+
+% Path to natural scene video file
+video_path = 'X:\\NaturalMovies\\RawData\\CT9000\\Nature\\All\\20190616_180258_3.mp4';  % UPDATE THIS PATH
+if ~exist(video_path, 'file')
+    warning(['Video file not found: ' video_path]);
+    warning('Please update video_path variable or comment out video analysis section');
+    % Continue without error to allow OTF modeling without video
+end
+% ========== END CONFIGURATION ==========
 
 %import normalized photoreceptor spectra (area = 1)
 %corrected for pre-receptoral filtering
@@ -22,18 +53,20 @@ StepWaveLen = 5;
 
 freqSf = logspace(-1.5,1,500);
 
-mD0 = 1/0.001756; %diopteric power of mouse eye = 1/focal length
-mPupilRadius = linspace(0.3,0.9,10)/1000; %in m
+% Mouse eye optical parameters
+focal_length_m = 0.001756;  % Mouse eye focal length in meters (1.756 mm)
+mD0 = 1/focal_length_m; %diopteric power of mouse eye = 1/focal length
+mPupilRadius = linspace(0.3,0.9,10)/1000; %in m (0.3-0.9 mm range)
 
 
-IllumArea = 1.02;
-IllumR = sqrt(IllumArea/pi)/1000;
-RelF0 = 0.73;
-ContR = sqrt(RelF0/pi)/1000;
+% Illumination area and pupil parameters (in mm²)
+IllumArea = 1.02;  % Total illumination area in mm²
+IllumR = sqrt(IllumArea/pi)/1000;  % Illumination radius in meters
+RelF0 = 0.73;  % Relative area for contrast condition
+ContR = sqrt(RelF0/pi)/1000;  % Contrast radius in meters
 
 %video settings
-
-video = 'X:\\NaturalMovies\\RawData\\CT9000\\Nature\\All\\20190616_180258_3.mp4';
+video = video_path;  % Use configured path from initialization section
 frame = 1;
 
 fullHeight = 1080;
@@ -147,6 +180,12 @@ for i = 1:length(mPupilRadius)
 end
 
 %% now image analysis
+if ~exist(video, 'file')
+    warning('Video file not found. Skipping natural scene analysis.');
+    warning(['Expected path: ' video]);
+    disp('OTF modeling completed successfully.');
+    return;
+end
 
 v=VideoReader(video);
 f = read(v,frame);

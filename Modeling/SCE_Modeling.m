@@ -1,9 +1,33 @@
-%% initialize
-%haven't dont anything yet
+%% Stiles-Crawford Effect (SCE) Modeling
+% This script models the Stiles-Crawford Effect and calculates retinal
+% illuminance as a function of pupil size, both with and without SCE.
+% It also generates optical transfer functions for different photoreceptor types.
+%
+% The Stiles-Crawford Effect describes the reduced efficiency of light
+% entering the eye at the pupil periphery compared to the center.
+%
+% Requirements:
+%   - MATLAB Image Processing Toolbox
+%   - isetbio toolbox (https://github.com/isetbio/isetbio)
+%   - mouseCore function (custom - contact authors)
+%
+% Author: Fitzpatrick et al., 2024
 
+%% initialize
 clear; clc; close all;
 
-addpath(genpath('X:\\isetbio-master'))
+% ========== CONFIGURATION - UPDATE THIS PATH ==========
+% Path to isetbio toolbox installation
+% Download from: https://github.com/isetbio/isetbio
+isetbio_path = 'X:\\isetbio-master';  % UPDATE THIS PATH
+if ~exist(isetbio_path, 'dir')
+    warning(['isetbio path not found: ' isetbio_path]);
+    warning('Please update isetbio_path variable to your isetbio installation directory');
+    warning('Download from: https://github.com/isetbio/isetbio');
+    error('Cannot proceed without isetbio');
+end
+addpath(genpath(isetbio_path))
+% ========== END CONFIGURATION ==========
 
 %import normalized photoreceptor spectra (area = 1)
 %corrected for pre-receptoral filtering
@@ -16,39 +40,52 @@ load MCone
 ieInit;
 
 %% Parameters
-StartWaveLen = 300;
-EndWaveLen = 780;
-StepWaveLen = 5;
+% Wavelength range for spectral analysis
+StartWaveLen = 300;  % nm
+EndWaveLen = 780;    % nm
+StepWaveLen = 5;     % nm
 
-nCSF = 500;
-nPupil = 100;
-nIllum = 100;
-nFreq = 500;
-nDist = 500;
-fl = 2.347/1000; %focal length in mm, back half Remtulla and Hallet
+% Simulation parameters
+nCSF = 500;     % Number of points for contrast sensitivity function
+nPupil = 100;   % Number of pupil sizes to test
+nIllum = 100;   % Number of illuminance levels
+nFreq = 500;    % Number of spatial frequencies
+nDist = 500;    % Number of distances
 
+% Mouse eye optical parameters (from Remtulla & Hallett)
+fl = 2.347/1000; %focal length in mm, back half of mouse eye
 tr = 0.7;% transmittance of the ocular media
 
-FWHM_d = 12; %in degrees, full width of half maximum, estimated from Wei Li's work in ground squirrel
-FWHM_m = fl*tand(FWHM_d);
-SCE_sigma = FWHM_m/(2*sqrt(2*log(2)));
+% Stiles-Crawford Effect parameters
+% Based on FWHM estimated from Wei Li's work in ground squirrel
+FWHM_d = 12; %in degrees, full width of half maximum
+FWHM_m = fl*tand(FWHM_d);  % Convert to meters
+SCE_sigma = FWHM_m/(2*sqrt(2*log(2)));  % Gaussian sigma from FWHM
 
 %% calculated params
 
-IllumArea = 1.02;
-IllumR = sqrt(IllumArea/pi)/1000;
-RelF0 = 0.73;
-ContR = sqrt(RelF0/pi)/1000;
+% Illumination and contrast parameters
+IllumArea = 1.02;  % Illumination area in mm²
+IllumR = sqrt(IllumArea/pi)/1000;  % Illumination radius in meters
+RelF0 = 0.73;  % Relative area for contrast condition
+ContR = sqrt(RelF0/pi)/1000;  % Contrast radius in meters
 
-freqSf = logspace(-1.5,1,nFreq);
+% Spatial frequency range (log-spaced)
+freqSf = logspace(-1.5,1,nFreq);  % cycles per degree
 
-dof_dist = linspace(0.1/100,50/100,nDist);
+% Distance range for depth of field calculations
+dof_dist = linspace(0.1/100,50/100,nDist);  % 0.1 to 50 cm in meters
 
-mD0 = 1/fl*1.3341; %diopteric power of mouse eye = 1/focal length in m *n_vitreous
-mPupilRadius = linspace(0.3,0.85,nPupil)/1000; %in m
+% Dioptric power calculation
+mD0 = 1/fl*1.3341; %diopteric power = (1/focal length in m) * refractive index of vitreous
 
+% Pupil radius range
+mPupilRadius = linspace(0.3,0.85,nPupil)/1000; %in meters (0.3-0.85 mm)
+
+% Illuminance range (log-spaced from 1 to 100,000 R*)
 Illum = logspace(0,5,nIllum);
 
+% 2D Gaussian function for Stiles-Crawford Effect
 gaus2d = @(x,y,xmu,ymu,sig)exp(-((((x-xmu).^2)/(2*sig.^2)) + (((y-ymu).^2)/(2*sig.^2))));
 
 %% Illuminance calculation, with and without Stiles Crawford Effect

@@ -1,6 +1,18 @@
-%This script analyzes PLR for a single experiment and generates a sigmoidal
-%fit and curve. It then saves the values at each illuminance and the EC50
-%from the curve fit. 
+%% Steady Contrast PLR Analysis - LED Setup (Individual)
+% This script analyzes pupillary responses to contrast stimuli at different
+% temporal frequencies. It performs FFT analysis to extract power at stimulus
+% frequencies.
+%
+% Input files (selected via GUI):
+%   - Parsed data file: Contains pupil traces, contrast levels, and frequency parameters
+%
+% Outputs:
+%   - Contrast response matrices organized by frequency
+%   - FFT power analysis at stimulus frequencies
+%   - Saved .mat file with all analysis results
+%
+% Author: Fitzpatrick et al., 2024
+
 clear; clc; close all;
 
 %%Load Parsed files

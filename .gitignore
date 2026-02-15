@@ -1,0 +1,43 @@
+# MATLAB
+*.asv
+*.m~
+*.mex*
+*.autosave
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Data files (uncomment if you don't want to track large data files)
+# *.mat
+# *.csv
+# *.xlsx
+
+# Figures and outputs (uncomment if you don't want to track outputs)
+# *.fig
+# *.png
+# *.jpg
+# *.pdf
+# *.eps
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+
+# IDE and editor files
+.vscode/
+.idea/
+*.code-workspace
+
+# Video files (typically too large for git)
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# External dependencies (if cloned locally)
+isetbio/
+isetbio-master/

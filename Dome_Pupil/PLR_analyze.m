@@ -1,13 +1,33 @@
+%% Pupillary Light Reflex (PLR) Analysis - Dome Setup
+% This script analyzes pupillary responses to different illuminance levels
+% in a dome/projection setup. It fits sigmoidal dose-response curves to
+% extract EC50 (half-maximal effective concentration) and Hill slope values.
+%
+% Input files (selected via GUI):
+%   - Parameter file: Contains stimIn/stimOut structures with experiment parameters
+%   - Left eye trace: Pupil area measurements over time
+%   - Right eye trace: Pupil area measurements over time
+%
+% Outputs:
+%   - Figures: Dose-response curves with sigmoidal fits
+%   - Saved .mat file: All analysis results including EC50, Hill slope, fitted curves
+%
+% Author: Fitzpatrick et al., 2024
+
 clear; clc; close all;
+
 %% Define variables and load data
 
-%make sure fps is ok
-stim_fps = 60;
-movie_fps = 15;
-mm_per_pix = 0.00345; %mm per pixel of trace measurements
+% Experimental parameters - adjust these for your setup
+stim_fps = 60;  % Stimulus presentation frame rate (Hz)
+movie_fps = 15; % Pupil tracking camera frame rate (Hz)
+mm_per_pix = 0.00345; % Conversion: millimeters per pixel for pupil area measurements
+                      % (depends on camera and magnification)
 
-conv = 1; %set to one to convert to R*
-cd_to_R = 13.8893; %empirical converstion between  cd/m^2 and R*
+% Illuminance conversion
+conv = 1; % Set to 1 to convert cd/m² to R* (photoisomerizations)
+cd_to_R = 13.8893; % Empirical conversion factor between cd/m² and R*
+                   % (photoisomerizations per photoreceptor per second)
 
 %parameters
 [fileName, pathName]=uigetfile ('*.mat','Select parameter data');
@@ -63,14 +83,15 @@ end
 
 %% speed
 
-%extract speed/distance of mouse
+% Extract speed/distance of mouse from wheel encoder
+% Wheel parameters: 15 cm diameter, 4028 pulses per rotation
 mSpeed = zeros(length(corrData),1);
 mSpeed(2:end) = abs(diff(corrData(:,end)));
-mSpeed(mSpeed>150 | mSpeed<-150)= 0; %points where wheel count cycles back around (arduino bit limit reached)
-%wheel is 15cm in diameter, 4028 pulses per rotation, acquired every frame
-mSpeed = mSpeed*(15*pi*stim_fps/4028); %now in cm/s
-mSpeed = downsample(mSpeed,stim_fps/movie_fps);
-smoothSpeed = movmean(mSpeed,movie_fps/2,'omitnan');
+mSpeed(mSpeed>150 | mSpeed<-150)= 0; % Remove points where encoder cycles (Arduino bit limit)
+% Convert to cm/s: (pulses/frame) * (circumference/pulses_per_rotation) * fps
+mSpeed = mSpeed*(15*pi*stim_fps/4028); % now in cm/s
+mSpeed = downsample(mSpeed,stim_fps/movie_fps); % Match pupil tracking frame rate
+smoothSpeed = movmean(mSpeed,movie_fps/2,'omitnan'); % Smooth with 0.5s window
 
 %% Process data
 time = (tEnd-tStart)/60;
@@ -94,11 +115,13 @@ R_I = R_I+double((stimIn.Adapt+stimIn.Pre+stimIn.Dur/2)*movie_fps);
 
 %% Calculate
 
+% Calculate pupil area at minimum constriction for each trial
 PupilChangeLeft = zeros(1,length(stimIn.ExpLum));
 PupilChangeRight = zeros(1,length(stimIn.ExpLum));
 
 for i = 1:length(stimIn.ExpLum)
    
+    % Average pupil area in ±2.5s window around minimum
     if isnan(L_I(i))
         PupilChangeLeft(i) = NaN;
     else
@@ -114,10 +137,9 @@ end
 
 %% Plot
 
-%create model sigmoidal function; b(1) is minimum value, b(2) is maximum
-%value, b(3) is EC50, b(4) is Hill slope
-%note that EC50 is for x that is halfway between b(1) and b(2), so not
-%necessarily 0.5
+% Sigmoidal function for dose-response curve fitting
+% Parameters: b(1)=minimum, b(2)=maximum, b(3)=EC50, b(4)=Hill slope
+% Note: EC50 is the illuminance at halfway between min and max response
 SigmoidFit = @(b,x)(b(1)+(b(2)-b(1))./(1+(b(3)./x).^b(4)));
 %Initial guess for least squares regression
 beta0 = [0,0.5,10,-1];

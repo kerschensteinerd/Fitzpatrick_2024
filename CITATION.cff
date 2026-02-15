@@ -8,8 +8,8 @@ authors:
     given-names: "[First Name]"
     # Add ORCID if available: orcid: "https://orcid.org/0000-0000-0000-0000"
   - name: "et al."
-repository-code: "https://github.com/kerschensteinerd/Fitzpatrick_2024"
-url: "https://github.com/kerschensteinerd/Fitzpatrick_2024"
+repository-code: "https://github.com/kerschensteinerd/Fitzpatrick2024_pupillary-contrast-response"
+url: "https://github.com/kerschensteinerd/Fitzpatrick2024_pupillary-contrast-response"
 keywords:
   - pupillary light reflex
   - contrast response

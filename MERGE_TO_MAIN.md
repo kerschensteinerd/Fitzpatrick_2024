@@ -4,7 +4,7 @@ The improvements have been committed to the `copilot/investigate-codebase-struct
 
 ## Option 1: Merge via GitHub Pull Request (Recommended)
 
-1. Go to: https://github.com/kerschensteinerd/Fitzpatrick_2024
+1. Go to: https://github.com/kerschensteinerd/Fitzpatrick2024_pupillary-contrast-response
 2. You should see a banner about the recent push to `copilot/investigate-codebase-structure`
 3. Click "Compare & pull request"
 4. Review the changes:
@@ -21,8 +21,8 @@ If you prefer to merge locally:
 
 ```bash
 # Clone the repository (if you haven't already)
-git clone https://github.com/kerschensteinerd/Fitzpatrick_2024.git
-cd Fitzpatrick_2024
+git clone https://github.com/kerschensteinerd/Fitzpatrick2024_pupillary-contrast-response.git
+cd Fitzpatrick2024_pupillary-contrast-response
 
 # Fetch the latest changes
 git fetch origin

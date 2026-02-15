@@ -67,8 +67,8 @@ The modeling scripts (`MF_Modeling.m` and `SCE_Modeling.m`) require:
 
 1. **Clone this repository:**
    ```bash
-   git clone https://github.com/kerschensteinerd/Fitzpatrick_2024.git
-   cd Fitzpatrick_2024
+   git clone https://github.com/kerschensteinerd/Fitzpatrick2024_pupillary-contrast-response.git
+   cd Fitzpatrick2024_pupillary-contrast-response
    ```
 
 2. **Set up MATLAB environment:**
@@ -281,7 +281,7 @@ Analysis scripts save comprehensive `.mat` files including:
 ### Getting Help
 
 For issues specific to the code:
-- Open an issue on GitHub: https://github.com/kerschensteinerd/Fitzpatrick_2024/issues
+- Open an issue on GitHub: https://github.com/kerschensteinerd/Fitzpatrick2024_pupillary-contrast-response/issues
 
 For scientific questions:
 - Refer to the published manuscript
@@ -308,7 +308,7 @@ Also cite the code repository:
   title={Pupillary Contrast Response Analysis Code},
   author={Fitzpatrick, et al.},
   year={2024},
-  url={https://github.com/kerschensteinerd/Fitzpatrick_2024}
+  url={https://github.com/kerschensteinerd/Fitzpatrick2024_pupillary-contrast-response}
 }
 ```
 
